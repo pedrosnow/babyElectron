@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */
 /* Document
    ========================================================================== */
@@ -376,6 +377,31 @@ template {
   z-index: 5;
 }
 
+.container-aviso-encerrando {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container-aviso-encerrando #card-viso-encerrando {
+  padding: 15px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+}
+.container-aviso-encerrando #card-viso-encerrando .container-titulo-descricao {
+  margin-left: 20px;
+}
+.container-aviso-encerrando #card-viso-encerrando .container-titulo-descricao .titulo {
+  font-weight: 600;
+  font-size: 20px;
+}
+.container-aviso-encerrando #card-viso-encerrando .container-titulo-descricao .descricao {
+  color: gray;
+}
+
 .container-aviso {
   width: 100%;
   height: 100%;
@@ -420,6 +446,46 @@ template {
   margin-top: 10px;
   background: red;
   color: #fff;
+}
+
+#container-configuracao {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+#container-configuracao #card-configuracao {
+  width: 40%;
+}
+#container-configuracao #card-configuracao .card-header {
+  width: 100%;
+}
+#container-configuracao #card-configuracao .card-body {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+#container-configuracao #card-configuracao .card-body #option-config ul {
+  padding: 0;
+}
+#container-configuracao #card-configuracao .card-body #option-config ul li {
+  cursor: pointer;
+  border: 1px solid rgb(183, 183, 183);
+  border-radius: 5px;
+  padding: 10px 30px;
+  list-style: none;
+  background: rgb(183, 183, 183);
+  margin-bottom: 1px;
+}
+#container-configuracao #card-configuracao .card-body #container-config {
+  margin-left: 10px;
+  width: 100%;
+  height: 100%;
+  padding: 30px 20px;
+  padding-bottom: 27px;
+  border-radius: 10px;
+  border: 1px solid rgb(183, 183, 183);
 }
 
 main {
@@ -487,4 +553,91 @@ main #btn-voltar {
   height: 37px;
   background: #5f885d;
   display: none;
+}
+main #btn-voltar:hover {
+  background: #5f885d;
+}
+
+.container-stream {
+  background: #313131;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container-stream .loading-video-stream {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container-stream .loading-video-stream #cardAviso {
+  width: 300px;
+  padding: 10px;
+  font-size: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container-stream .loading-video-stream #cardAviso .titulo {
+  font-size: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.container-stream .loading-video-stream #cardAviso .circle {
+  margin-left: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: red; /* Cor inicial do círculo */
+  transition: background-color 0.3s ease; /* Efeito de transição suave */
+  animation: pulse 1s infinite; /* Inicia a animação "pulse" infinitamente */
+}
+.container-stream .container-video {
+  margin-right: 10px;
+  padding: 10px;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 30px;
+  width: 80%;
+  height: 98%;
+}
+.container-stream #videostram {
+  width: 100%;
+  height: 100%;
+}
+.container-stream .container-painel {
+  width: 18%;
+  height: 98%;
+  border-radius: 5px;
+  background: #bc0000;
+  color: #fff;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-size: 30px;
+}
+.container-stream .container-painel:hover {
+  background: red;
+  color: #fff;
 }/*# sourceMappingURL=style.css.map */

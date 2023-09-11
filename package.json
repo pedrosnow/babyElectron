@@ -9,7 +9,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^26.1.0"
+    "electron": "^26.1.0",
+    "video.js": "^8.5.2"
   },
   "dependencies": {
     "bootstrap": "^5.3.1",

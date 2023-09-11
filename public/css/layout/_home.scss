@@ -70,5 +70,9 @@ main{
         height: 37px;
         background: #5f885d;
         display: none;
+
+        &:hover{
+            background: #5f885d;
+        }
     }
 }

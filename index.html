@@ -3,19 +3,63 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:5000">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost http://localhost:5000; font-src 'self' data:; media-src 'self' http://localhost blob:;">
 
   <link rel="stylesheet" href="./public/css/style.css">
   <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="./node_modules/sweetalert2/dist/sweetalert2.min.css">
   <link rel="stylesheet" href="./public/fontawesome/css/all.min.css">
-  
+
+  <script src="./node_modules/video.js/dist/video.js"></script>
+  <link rel="stylesheet" href="./node_modules/video.js/dist/video-js.css">
+
   <script src="./public/js/jquery.js"></script>
   
   <title>Stream Bebe</title>
 </head>
 
 <body>
+  <div id="container-modal">
+    <div id="container-configuracao">
+      <div class="card" id="card-configuracao">
+        <div class="card-header">ddd</div>
+        <div class="card-body">
+          <div id="option-config">
+            <ul>
+              <li>Dispositivos</li>
+              <li>Ffmpeg</li>
+              <li>Conexao</li>
+            </ul>
+          </div>
+          <div id="container-config">
+            <div class="row">
+              <div class="col">
+                <label for="">Dispositiv de Video</label>
+                <select name="dispoaudio" id="dispoaudio" class="form-control">
+                  <option value="null">nenhum dispositivo selecionado</option>
+                </select>
+              </div>
+            </div>
+            <br>
+            <div class="row">
+              <div class="col">
+                <label for="">Dispositiv de audio</label>
+                <select name="dispoaudio" id="dispoaudio" class="form-control">
+                  <option value="null">nenhum dispositivo selecionado</option>
+                </select>
+              </div>
+            </div>
+            <br>
+            <div class="row" id="container-atualizar-dispositivo">
+              <div class="col">
+                <button class="btn btn-success"><li class="	fas fa-redo-alt"></li></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <main>
     <div class="container-logo-titulo">
       <div class="logo">
@@ -38,8 +82,8 @@
           </div>
         </div>
       </div>
-      <button onclick="index.proximo(this)" id="btn-voltar" class="btn btn-light"><li class="fas fa-chevron-circle-left"></li></button>
-      <button onclick="index.proximo(this)" id="btn-start" class="btn btn-light">Proximo</button>
+      <button onclick="index.proximo(this)" id="btn-voltar" class="btn"><li class="fas fa-chevron-circle-left"></li></button>
+      <button onclick="index.proximo(this)" id="btn-start" class="btn">Proximo</button>
       <a href="#">Configurações</a>
     </div>
   </main>
@@ -47,6 +91,7 @@
   <script src="./public/js/index.js"></script>
   <script src="./node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
 
+  
 </body>
 
 </html>

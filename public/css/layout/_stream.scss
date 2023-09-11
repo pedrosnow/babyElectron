@@ -1,0 +1,101 @@
+.container-stream{
+    background: #313131;
+    height: 100%;
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .loading-video-stream{
+        width: 100%;
+        height: 100%;
+        background: #000;
+        z-index: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        #cardAviso{
+            width: 300px;
+            padding: 10px;
+            font-size: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+
+            .titulo{
+                font-size: 22px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            @keyframes pulse {
+                0% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.2);
+                    opacity: 0.8;
+                }
+                100% {
+                    transform: scale(1);
+                }
+            }
+            
+        
+            .circle {
+                margin-left: 10px;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background-color: red; /* Cor inicial do círculo */
+                transition: background-color 0.3s ease; /* Efeito de transição suave */
+                animation: pulse 1s infinite; /* Inicia a animação "pulse" infinitamente */
+            }
+            
+
+        }
+    }
+
+    .container-video{
+        margin-right: 10px;   
+        padding: 10px;
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 30px;
+        width: 80%;
+        height: 98%;
+
+       
+    }
+    #videostram{
+        width: 100%;
+        height: 100%;
+    }
+
+    .container-painel{
+        width: 18%;
+        height: 98%;
+        border-radius: 5px;
+        background: #bc0000;
+        color: #fff;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        font-size: 30px;
+
+    }
+
+    .container-painel:hover{
+        background: red;
+        color: #fff;
+    }
+
+   
+
+}

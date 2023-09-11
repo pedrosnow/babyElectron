@@ -115,14 +115,16 @@ let index = {
         `)
 
         setTimeout(() => {
-
+        
             fetch('http://localhost:5000/gerarchave',{
                 method: "POST",
             })
             .then(response => response.text())
             .then(result => {
-                this.data.chave = result
+                this.data.chave = result.replace(/"/g, '').replace(/\n/g, '')
                 this.sendMensagem()
+                console.log(this.data.chave)
+
             })
             .catch(error => console.log('error', error));
 
@@ -152,7 +154,8 @@ let index = {
                     $("#container-modal").remove()
                     this.avisoConexao()
                 }else{
-                    
+                    $("#descricao-modal").html('Iniciando a live.')
+                    this.controllStream()
                 }
                 
             })
@@ -165,20 +168,20 @@ let index = {
 
         $('body').prepend(`
         
-        <div id="container-modal">
-            <div class="container-aviso">
-                <div class="card" id="card-aviso">
-                <li class="close-card-aviso">+</li>
-                <img src="./public/img/icons8-erro-96.png" width="100px" height="100px">
-                    <div class="container-titulo-descricao">
-                        <div class="titulo">Aviso!!</div>
-                        <div class="descricao">Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente</div>
-                        <button class="btn" id="button-gravar">Gravar, enviar depois</button>
+            <div id="container-modal">
+                <div class="container-aviso">
+                    <div class="card" id="card-aviso">
+                    <li class="close-card-aviso">+</li>
+                    <img src="./public/img/icons8-erro-96.png" width="100px" height="100px">
+                        <div class="container-titulo-descricao">
+                            <div class="titulo">Aviso!!</div>
+                            <div class="descricao">Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente</div>
+                            <button class="btn" id="button-gravar">Gravar, enviar depois</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
+
         `)
 
         document.querySelector(".close-card-aviso").addEventListener("click", ()=>{
@@ -186,6 +189,181 @@ let index = {
             window.location.reload()
         })
         
+    },
+
+    controllStream(){
+
+        fetch('http://localhost:5000/record_and_stream',{
+            method: "POST",
+            headers: {
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify({
+                chave: this.data.chave
+            })
+        })
+        .then(response => response.text())
+        .then(result => console.log(result))
+        .catch(error => console.log('error', error));
+
+        $("#container-modal").remove()
+        $("body").html('')
+        this.streamStart()
+
+    },
+
+    streamStart(){
+
+        $("body").append(`
+
+        <main class="container-stream">
+            <div class="container-video">
+            
+            <div class="loading-video-stream">
+                <div class="card" id="cardAviso">
+                    <div class="titulo">Live Online <div class="circle"></div> </div>
+                    <div class="descricao">Carregando a pre visualização</div>
+                </div>
+            </div>
+        
+            </div>
+            <button class="container-painel btn" id="encerrar">
+                <div>E</div>
+                <div>N</div>
+                <div>C</div>
+                <div>E</div>
+                <div>R</div>
+                <div>R</div>
+                <div>A</div>
+                <div>R</div>
+            </button>
+        </main>
+        
+        <script>
+        
+        setTimeout(()=>{
+
+            $(".container-video").html('<video id="videostram" class="video-js vjs-default-skin" controls autoplay data-setup="{}"></video>');
+            
+            const player = videojs('videostram');
+            let retryCount = 0;
+            const maxRetries = 4; // Número máximo de tentativas
+        
+            function loadVideo() {
+                player.src({
+                    src: 'http://localhost/hls/${this.data.chave}/index.m3u8',
+                    type: 'application/x-mpegURL'
+                });
+                player.load();
+                player.play();
+            }
+        
+            player.ready(function () {
+                this.controlBar.addChild('CurrentTimeDisplay');
+                this.controlBar.addChild('TimeDivider');
+                this.controlBar.addChild('DurationDisplay');
+                this.controlBar.addChild('ProgressControl');
+                this.controlBar.addChild('PlaybackRateMenuButton');
+        
+                loadVideo();
+            });
+        
+            player.on('error', function (event) {
+                const error = player.error();
+        
+                if (error.code === 2) {
+                    // Verifica se ainda pode tentar novamente
+                    if (retryCount < maxRetries) {
+                        retryCount++;
+                        // Tenta novamente após um breve intervalo (por exemplo, 5 segundos)
+                        setTimeout(function () {
+                            loadVideo();
+                        }, 2000); // 5 segundos
+                    } else {
+                        // Excedeu o número máximo de tentativas, faça o que desejar aqui
+                        console.log('Excedeu o número máximo de tentativas');
+                    }
+                }
+            });
+            
+        },20000)
+        
+        </script>
+    
+        
+        `)
+
+        document.getElementById("encerrar").addEventListener("click", ()=>{
+
+            Swal.fire({
+                title: 'Aviso!',
+                text: "Deseja encerrar a live ?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sim',
+                cancelButtonText: 'Não',
+                allowOutsideClick: false,
+              }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    fetch('http://localhost:5000/stream/encerrar',{
+                        method: "GET",
+                        headers: {
+                            "Content-Type":"application/json"
+                        },
+                    })
+                    .then(response => response.text())
+                    .then(result => {
+                        
+                        let response = JSON.parse(result)
+                        
+                        if(response.status == 200){
+
+                            $("body").prepend(`
+                            
+                            <div id="container-modal">
+                                <div class="container-aviso-encerrando">
+                                <div class="card" id="card-viso-encerrando">
+                                    <span class="loader"></span>
+                                    <div class="container-titulo-descricao">
+                                    <div class="titulo">Encerrando</div>
+                                    <div class="descricao">A live esta sendo encerrada</div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                            
+                            `)
+
+                        }else{
+                            
+                            Swal.fire({
+                                title: 'Erro!',
+                                text: "Algo inesperado aconteceu, contate o suporte!!",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Sim',
+                                cancelButtonText: 'Não',
+                                allowOutsideClick: false,
+                            })
+
+                        }
+
+                    })
+                    .catch(error => console.log('error', error));
+                 
+                }
+              })
+
+            
+            
+        })
+
     }
 
    
