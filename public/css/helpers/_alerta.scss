@@ -1,0 +1,51 @@
+.container-aviso{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    #card-aviso{
+        position: relative;
+        padding: 20px 10px;
+        display: flex;
+        flex-direction: row;
+
+        .close-card-aviso{
+            position: absolute;
+            top: 3px;
+            font-weight: 600;
+            right: 5px;
+            cursor: pointer;
+            color: gray;
+            list-style: none;
+            font-size: 25px;
+            transform: rotate(45deg);
+            // border: 1px solid red;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container-titulo-descricao{
+            margin-top: 7px;
+            margin-left: 20px;
+
+            .titulo{
+                font-size: 20px;
+                font-weight: 500;
+            }
+            .descricao{
+                color: gray;
+                width: 440px;
+            }
+        }
+
+        #button-gravar{
+            margin-top: 10px;
+            background: red;
+            color: #fff;
+        }
+    }
+}

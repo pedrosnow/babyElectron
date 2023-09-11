@@ -1,0 +1,52 @@
+<!DOCTYPE html style="width: 100%; height: 100% !important">
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:5000">
+
+  <link rel="stylesheet" href="./public/css/style.css">
+  <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./node_modules/sweetalert2/dist/sweetalert2.min.css">
+  <link rel="stylesheet" href="./public/fontawesome/css/all.min.css">
+  
+  <script src="./public/js/jquery.js"></script>
+  
+  <title>Stream Bebe</title>
+</head>
+
+<body>
+  <main>
+    <div class="container-logo-titulo">
+      <div class="logo">
+        <img src="./public/img/incone.svg">
+      </div>
+      <div class="titulo">Meu bebê</div>
+    </div>
+    <div class="container-formulario">
+      <div class="titulo">Live</div>
+      <div class="descricao">
+        Para iniciar serar nescessario o <strong>codigo do paciente</strong> e um <strong>numero de whatsapp</strong> para enviar o link de acesso para o
+        paciente
+      </div>
+      <div id="form">
+        <div class="row">
+          <div class="col">
+            <label>Cod. Paciente</label>
+            <input type="text" class="form-control" oninput="index.checkedNumber(this)" id="numero-paciente"
+              placeholder="Digite o codigo do paciente" autofocus>
+          </div>
+        </div>
+      </div>
+      <button onclick="index.proximo(this)" id="btn-voltar" class="btn btn-light"><li class="fas fa-chevron-circle-left"></li></button>
+      <button onclick="index.proximo(this)" id="btn-start" class="btn btn-light">Proximo</button>
+      <a href="#">Configurações</a>
+    </div>
+  </main>
+  <script src="./public/jQuery-Mask-Plugin-master/dist/jquery.mask.min.js"></script>
+  <script src="./public/js/index.js"></script>
+  <script src="./node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "babyelectron",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^26.1.0"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.1",
+    "sweetalert2": "^11.7.27"
+  }
+}

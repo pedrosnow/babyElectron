@@ -1,0 +1,50 @@
+.loader {
+    width: 48px;
+    height: 48px;
+    border: 5px solid #603C12;
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    display: inline-block;
+    box-sizing: border-box;
+    animation: rotation 1s linear infinite;
+    }
+
+    @keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+.container-loading{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+
+    #card-loading{
+        background: #f2f2f2;
+        padding: 20px;
+        // width: 400px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
+
+        .container-titulo-descricao{
+            margin-left: 20px;
+
+            .titulo{
+                font-weight: 600;
+                font-size: 20px;
+            }
+            .descricao{
+                color: gray;
+            }
+        }
+    }
+}
