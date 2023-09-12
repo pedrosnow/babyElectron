@@ -364,6 +364,148 @@ let index = {
             
         })
 
+    },
+
+    configuracao(){
+
+        $("body").prepend(`
+        
+            <div id="container-modal">
+                <div id="container-configuracao">
+                    <div class="card" id="card-configuracao">
+                        <div class="card-header">Configuração <li>+</li> </div>
+                            <div class="card-body">
+                            <div id="option-config">
+                                <ul>
+                                    <li class="activate">Dispositivos</li>
+                                    <li>Ffmpeg</li>
+                                    <li>Conexao</li>
+                                    <li>Salvar</li>
+                                </ul>
+                            </div>
+                            <div id="container-config">
+
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+        `);
+
+        let remover_activate = () => {
+            let li = document.querySelectorAll('li')
+
+            li.forEach(element => {
+                element.classList.remove('activate')
+            });
+        }
+
+        let salvar = () => {
+            $('#container-config').html(``)
+        }
+
+        let ffmpeg = () => {
+            $('#container-config').html(`
+            
+            <div class="row">
+                <div class="col">
+                    <label>Largura</label>
+                    <input type="text"class="form-control"> 
+                </div>
+                <div class="col">
+                    <label>Altura</label>
+                    <input type="text"class="form-control"> 
+                </div>
+                </div>
+                <br>
+                <div class="row">
+                <div class="col">
+                    <label>Taxa de mostragem de áudio</label>
+                    <input type="text" class="form-control">
+                </div>
+                <div class="col-4">
+                    <label>Taxa de bits de áudio</label>
+                    <input type="text" class="form-control">
+                </div>
+            </div> 
+            
+            `);
+        }
+
+        let conexao = () => {
+
+            $("#container-config").html(`
+            
+            <div class="row">
+                <div class="col">
+                    <label for="">Servidor RMTP</label>
+                    <input type="text" class="form-control">
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                <div class="col">
+                    <label>Servidor Principal</label>
+                    <input type="text" class="form-control">
+                </div>
+            </div> 
+            
+            `);
+        }
+
+        let dispositivo = () => {
+
+            $("#container-config").html(`
+            
+            <div class="row">
+                <div class="col">
+                    <label for="">Dispositiv de Video</label>
+                    <select name="dispoaudio" id="dispoaudio" class="form-control">
+                    <option value="null">nenhum dispositivo selecionado</option>
+                    </select>
+                </div>
+                </div>
+                <br>
+                <div class="row">
+                <div class="col">
+                    <label for="">Dispositiv de audio</label>
+                    <select name="dispoaudio" id="dispoaudio" class="form-control">
+                    <option value="null">nenhum dispositivo selecionado</option>
+                    </select>
+                </div>
+                </div>
+                <br>
+                <div class="row" id="container-atualizar-dispositivo">
+                <div class="col">
+                    <button class="btn btn-success"><li class="	fas fa-redo-alt"></li></button>
+                </div>
+            </div> 
+            
+            `);
+        }
+
+        let opcoes = {'Dispositivos': dispositivo, "Conexao": conexao, "Ffmpeg": ffmpeg, "Salvar": salvar}
+
+        let li = document.querySelectorAll('li')
+
+        opcoes['Dispositivos']()
+
+        li.forEach(element => {
+            element.addEventListener('click', (event)=>{
+                remover_activate()
+                element.classList.add('activate')
+                opcoes[element.textContent]()
+            })
+        });
+
+
+    
+
+
+    
+
     }
 
    
