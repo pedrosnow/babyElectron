@@ -1,0 +1,20 @@
+#container-prgresso{
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    .container-titulo-progresso{
+        // border: 1px solid red;
+        margin-left: 10px;
+        .titulo{
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .progresso{
+            font-size: 15px;
+        }
+    }
+}

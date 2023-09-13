@@ -7,24 +7,6 @@ let index = {
         pacienteid: ""
     },
 
-    init(){
-        let buttons = ['Proximo', 'Iniciar']
-        document.addEventListener('keypress', e => {
-            if(e.key == "Enter")
-            {
-
-                let button = document.querySelectorAll("button")
-                for(const row of button){
-
-                    const result = buttons.find(index => index == row.textContent)
-                    
-                    result ? row.click() : ""
-                }
-
-            }
-        })
-
-    },
     
     proximo(e){
 
@@ -121,17 +103,21 @@ let index = {
             .then(response => response.text())
             .then(result => {
                 this.data.chave = result.replace(/"/g, '').replace(/\n/g, '')
-                this.sendMensagem()
+         
+                $("#descricao-modal").html('Iniciando a live')
+
+                setTimeout(() => {
+                    this.controllStream()
+                },2000);
+                
             })
             .catch(error => console.log('error', error));
 
         }, 1000);
 
     },
-
+    
     sendMensagem(){
-        
-        $('#descricao-modal').html(`Enviando o acesso para o numero ${this.data.numeroLustrativo}`)
 
         setTimeout(() => {
             
@@ -148,44 +134,24 @@ let index = {
                 let resultR = JSON.parse(result)
 
                 if(resultR.erro){
-                    $("#container-modal").remove()
-                    this.avisoConexao()
-                }else{
-                    $("#descricao-modal").html('Iniciando a live.')
-                    this.controllStream()
+                       
+                    Swal.fire({
+                        title: 'Erro!',
+                        text: `Não foi possivel fazer o envio para o numero ${this.data.numeroLustrativo}, o servidor deve está off ou numero do celular não existe`,
+                        icon: 'warning',
+                        showCancelButton: false,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Sim',
+                        cancelButtonText: 'Não',
+                        allowOutsideClick: false,
+                    })
+
                 }
-                
             })
             .catch(error => console.log('error', error));
 
         }, 1000);
-    },
-
-    avisoConexao(){
-
-        $('body').prepend(`
-        
-            <div id="container-modal">
-                <div class="container-aviso">
-                    <div class="card" id="card-aviso">
-                    <li class="close-card-aviso">+</li>
-                    <img src="./public/img/icons8-erro-96.png" width="100px" height="100px">
-                        <div class="container-titulo-descricao">
-                            <div class="titulo">Aviso!!</div>
-                            <div class="descricao">Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente</div>
-                            <button class="btn" id="button-gravar">Gravar, enviar depois</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        `)
-
-        document.querySelector(".close-card-aviso").addEventListener("click", ()=>{
-            $("#container-modal").remove()
-            window.location.reload()
-        })
-        
     },
 
     controllStream(){
@@ -201,10 +167,27 @@ let index = {
             })
         })
         .then(response => response.text())
-        .then(result => console.log(result))
+        .then(result => {
+
+            if(result == "Erro: Erro ao iniciar a transmissão ao vivo"){
+
+                Swal.fire({
+                    title: 'Erro!',
+                    text: "Não foi possivel iniciar a live porque o programar tentou se conectar ao dispotivo de audio ou de video e não conseguiu",
+                    icon: 'warning',
+                    showCancelButton: false,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sim',
+                    cancelButtonText: 'Não',
+                    allowOutsideClick: false,
+                })
+
+            }
+
+        })
         .catch(error => console.log('error', error));
 
-        $("#container-modal").remove()
         $("body").html('')
         this.streamStart()
 
@@ -223,9 +206,25 @@ let index = {
                     <div class="descricao">Carregando a pre visualização</div>
                 </div>
             </div>
-        
+
             </div>
-            <button class="container-painel btn" id="encerrar">
+            <div class="container_options-button">
+                
+                <div class="container-send-number">
+                    <div class="row">
+                    <div class="col">
+                        <label class="text-light">Enviando o Acesso</label>
+                        <input type="text" class="form-control" value="(86) 9 95747604">
+                    </div>
+                    </div>
+                    <div class="row">
+                    <div class="col">
+                        <button class="btn" id="enviar">00:40</button>
+                    </div>
+                    </div>
+                </div>
+
+                <button class="container-painel btn" id="encerrar">
                 <div>E</div>
                 <div>N</div>
                 <div>C</div>
@@ -234,11 +233,12 @@ let index = {
                 <div>R</div>
                 <div>A</div>
                 <div>R</div>
-            </button>
+                </button>
+            </div>
         </main>
-        
+
         <script>
-        
+
         setTimeout(()=>{
 
             $(".container-video").html('<video id="videostram" class="video-js vjs-default-skin" controls autoplay data-setup="{}"></video>');
@@ -246,7 +246,7 @@ let index = {
             const player = videojs('videostram');
             let retryCount = 0;
             const maxRetries = 4; // Número máximo de tentativas
-        
+
             function loadVideo() {
                 player.src({
                     src: 'http://localhost/hls/${this.data.chave}/index.m3u8',
@@ -255,20 +255,20 @@ let index = {
                 player.load();
                 player.play();
             }
-        
+
             player.ready(function () {
                 this.controlBar.addChild('CurrentTimeDisplay');
                 this.controlBar.addChild('TimeDivider');
                 this.controlBar.addChild('DurationDisplay');
                 this.controlBar.addChild('ProgressControl');
                 this.controlBar.addChild('PlaybackRateMenuButton');
-        
+
                 loadVideo();
             });
-        
+
             player.on('error', function (event) {
                 const error = player.error();
-        
+
                 if (error.code === 2) {
                     // Verifica se ainda pode tentar novamente
                     if (retryCount < maxRetries) {
@@ -285,11 +285,38 @@ let index = {
             });
             
         },20000)
-        
+
         </script>
-    
+        
         
         `)
+
+        let time = 15
+
+        let Time = setInterval(() => {
+
+            const minutes = Math.floor(time / 60);
+            const seconds = time % 60;
+          
+            const formattedMinutes = String(minutes).padStart(2, '0');
+            const formattedSeconds = String(seconds).padStart(2, '0');
+          
+            $("#enviar").html(`${formattedMinutes}:${formattedSeconds}`);
+            
+            if (time === 0) {
+              clearInterval(Time);
+              this.sendMensagem()
+            }
+          
+            time = time - 1;
+
+
+        }, 1000);
+
+        document.getElementById("enviar").addEventListener("click", ()=>{
+            clearInterval(Time)
+            this.sendMensagem()
+        })
 
         document.getElementById("encerrar").addEventListener("click", ()=>{
 
@@ -333,27 +360,15 @@ let index = {
                                     </div>
                                     </div>
                                 </div>
+
                             `)
 
-                            setTimeout(() => {
+                           setTimeout(() => {
 
-                                $("#titulo-encerrar").html('Carregando...')
-                                $("#alerta-descricao-encerrando").html('Convertendo o arquivos para o formato suportado')
+                            window.location.reload()
 
-                                fetch('http://localhost:5000/converte',{
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type":"application/json"
-                                    },
-                                    body: JSON.stringify({'name_file': this.data.chave})
-                                })
-                                .then(response => response.text())
-                                .then(result => {
-                                    this.uploadFile()
-                                })
-                                .catch(error => console.log('error', error));
-
-                            }, 1500);
+                           }, 3000);
+                            
 
                         }else{
                             
@@ -383,20 +398,6 @@ let index = {
 
     },
 
-    uploadFile(){
-
-        fetch('http://localhost:5000/uploadFile',{
-            method: "POST",
-            headers: {
-                "Content-Type":"application/json"
-            },
-            body: JSON.stringify({'chave': this.data.chave})
-        })
-        .then(response => response.text())
-        .then(result => console.log(result))
-        .catch(error => console.log('error', error));
-
-    },
     
     configuracao(){
 
@@ -929,11 +930,153 @@ let index = {
             })
         });
 
-    }
+    },
 
-   
+    
+    // Processo(){
+        
+    //     let enviado = 0
+    //     let max = 0
+    //     let index = 0
+    //     let control = []
+    //     let erro = []
 
+    //     $("main").append(`
+    //         <div id="container-prgresso">
+    //             <div class="spinner-border" style="width: 2.5rem; height: 2.5rem;" role="status"></div>
+    //                 <div class="container-titulo-progresso">
+    //                 <div class="titulo">Processando <span class="badge badge-secondary" style="background: #000" id="indicator">0</span></div>
+    //                 <div class="progresso" id="processo-after">
+    //                     Verificando...
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     `)
+
+    //     fetch("http://localhost:5000/processo/verificar", {
+    //         method: 'POST',
+    //     })
+    //     .then(response => response.text())
+    //     .then(result => {
+
+    //         const response = JSON.parse(result)
+
+    //         max = response.length
+    //         for(const row of response){
+    //             control.push(row)
+    //         }
+
+    //         if(response.length == 0){
+    //             $("#container-prgresso").remove()
+    //         }
+            
+    //         let processo = () => {
+
+    //             $("#processo-after").html('1/2 Processando o arquivo')
+    //             $("#indicator").html(max)
+
+    //            setTimeout(() => {
+    //                 fetch('http://localhost:5000/converte',{
+    //                     method: "POST",
+    //                     headers: {
+    //                         "Content-Type":"application/json"
+    //                     },
+    //                     body: JSON.stringify({'name_file': control[index].chave})
+    //                 })
+    //                 .then(response => response.text())
+    //                 .then(result => {
+
+    //                     $("#processo-after").html('2/2 Enviando o arquivo')
+
+    //                     setTimeout(() => {
+                            
+                              
+    //                     fetch('http://localhost:5000/uploadFile',{
+    //                         method: "POST",
+    //                         headers: {
+    //                             "Content-Type":"application/json"
+    //                         },
+    //                         body: JSON.stringify({'chave': control[index].chave})
+    //                     })
+    //                     .then(response => response.text())
+    //                     .then(result => {
+
+    //                         if(!result == "erro"){
+
+    //                             $("#processo-after").html('Enviado com sucesso')
+
+    //                             enviado = enviado + 1
+        
+    //                             setTimeout(() => {
+                                    
+    //                                 if(enviado < max){
+    //                                     index = index + 1
+    //                                     processo()
+    //                                 }else{
+    //                                     if(erro.length == 0){
+
+    //                                         $("#container-prgresso").remove()
+
+    //                                     }else{
+
+    //                                         control = control.splice(0, control.length)
+                                            
+    //                                         for(const row of erro){
+    //                                             control.push(row)
+    //                                         }
+    //                                     }
+    //                                 }
+        
+    //                             }, 1000);
+
+    //                         }else{
+
+    //                             $("#indicator").html('Não foi possivel enviar')
+    //                             $("#processo-after").html('Programa vai ficar tentando até conseguir')
+
+    //                             erro.push(control[index])
+
+    //                             setTimeout(() => {
+    //                                 processo()
+    //                             }, 1000);
+    //                         }
+                        
+    //                     })
+    //                     .catch(error => console.log('error', error));
+
+    //                     }, 2000);
+
+    //                 })
+    //                 .catch(error => console.log('error', error));
+
+    //            }, 100000);
+    //         }            
+    //         processo()
+
+    //     })
+    //     .catch(error => console.log('error', error));
+
+        // console.log(max)
+
+     
+
+        // console.log(this.data)
+
+        
+
+        // setTimeout(() => {
+
+        //     $("#titulo-encerrar").html('Carregando...')
+        //     $("#alerta-descricao-encerrando").html('Convertendo o arquivos para o formato suportado')
+
+       
+
+        // }, 1500);
+
+    // },
+
+  
    
 }
 
-index.init()
+

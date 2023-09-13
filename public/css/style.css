@@ -539,6 +539,25 @@ template {
   animation: rotation 1s linear infinite;
 }
 
+#container-prgresso {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+#container-prgresso .container-titulo-progresso {
+  margin-left: 10px;
+}
+#container-prgresso .container-titulo-progresso .titulo {
+  font-size: 16px;
+  font-weight: 600;
+}
+#container-prgresso .container-titulo-progresso .progresso {
+  font-size: 15px;
+}
+
 main {
   height: 100%;
   display: flex;
@@ -675,9 +694,54 @@ main #btn-voltar:hover {
   width: 100%;
   height: 100%;
 }
-.container-stream .container-painel {
+.container-stream .container_options-button {
   width: 18%;
   height: 98%;
+}
+.container-stream .container_options-button .container-send-number {
+  background: #FFF;
+  background: #000000;
+  padding: 13px 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  position: relative;
+}
+.container-stream .container_options-button .container-send-number #enviar {
+  background: green;
+  color: #fff;
+  width: 100%;
+  margin-top: 10px;
+}
+.container-stream .container_options-button .container-send-number #modal-aviso-sucesso {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  z-index: 5;
+  background: #ffffff;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.container-stream .container_options-button .container-send-number #modal-aviso-sucesso .incone {
+  margin-right: 10px;
+  margin-left: 20px;
+  font-size: 40px;
+  color: rgb(0, 192, 0);
+}
+.container-stream .container_options-button .container-send-number #modal-aviso-sucesso .container-status .titulo {
+  color: rgb(0, 192, 0);
+  font-size: 25px;
+}
+.container-stream .container_options-button .container-send-number #modal-aviso-sucesso .container-status .descricao {
+  color: rgb(0, 192, 0);
+  font-size: 17px;
+}
+.container-stream .container-painel {
+  width: 100%;
+  height: 85%;
   border-radius: 5px;
   background: #bc0000;
   color: #fff;
