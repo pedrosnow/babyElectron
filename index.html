@@ -20,7 +20,9 @@
 
 <body>
 
-<!-- <main>
+  
+
+<main>
     <div class="container-logo-titulo">
       <div class="logo">
         <img src="./public/img/incone.svg">
@@ -47,109 +49,13 @@
       <a href="#" onclick="index.configuracao()">Configurações</a>
     </div>
     
-  </main> -->
-
-  <main class="container-stream">
-    <div class="container-video">
-    
-    <div class="loading-video-stream">
-        <div class="card" id="cardAviso">
-            <div class="titulo">Live Online <div class="circle"></div> </div>
-            <div class="descricao">Carregando a pre visualização</div>
-        </div>
-    </div>
-
-    </div>
-    <div class="container_options-button">
-        
-        <div class="container-send-number">
-          <div id="modal-aviso-sucesso">
-            <li class="incone fas fa-check-circle"></li>
-            <div class="container-status">
-              <div class="titulo">Sucesso</div>
-              <div class="descricao">O acesso foi enviado para o <br> (86) 9 995747604</div>
-            </div>
-          </div>
-            <div class="row">
-            <div class="col">
-                <label class="text-light">Enviando o Acesso</label>
-                <input type="text" class="form-control" value="(86) 9 95747604">
-            </div>
-            </div>
-            <div class="row">
-            <div class="col">
-                <button class="btn" id="enviar">00:40</button>
-            </div>
-            </div>
-        </div>
-
-        <button class="container-painel btn" id="encerrar">
-        <div>E</div>
-        <div>N</div>
-        <div>C</div>
-        <div>E</div>
-        <div>R</div>
-        <div>R</div>
-        <div>A</div>
-        <div>R</div>
-        </button>
-    </div>
-</main>
-
-<script>
-
-setTimeout(()=>{
-
-    $(".container-video").html('<video id="videostram" class="video-js vjs-default-skin" controls autoplay data-setup="{}"></video>');
-    
-    const player = videojs('videostram');
-    let retryCount = 0;
-    const maxRetries = 4; // Número máximo de tentativas
-
-    function loadVideo() {
-        player.src({
-            src: 'http://localhost/hls/${this.data.chave}/index.m3u8',
-            type: 'application/x-mpegURL'
-        });
-        player.load();
-        player.play();
-    }
-
-    player.ready(function () {
-        this.controlBar.addChild('CurrentTimeDisplay');
-        this.controlBar.addChild('TimeDivider');
-        this.controlBar.addChild('DurationDisplay');
-        this.controlBar.addChild('ProgressControl');
-        this.controlBar.addChild('PlaybackRateMenuButton');
-
-        loadVideo();
-    });
-
-    player.on('error', function (event) {
-        const error = player.error();
-
-        if (error.code === 2) {
-            // Verifica se ainda pode tentar novamente
-            if (retryCount < maxRetries) {
-                retryCount++;
-                // Tenta novamente após um breve intervalo (por exemplo, 5 segundos)
-                setTimeout(function () {
-                    loadVideo();
-                }, 2000); // 5 segundos
-            } else {
-                // Excedeu o número máximo de tentativas, faça o que desejar aqui
-                console.log('Excedeu o número máximo de tentativas');
-            }
-        }
-    });
-    
-},20000)
-
-</script>
+  </main>
 
   <script src="./public/jQuery-Mask-Plugin-master/dist/jquery.mask.min.js"></script>
   <script src="./public/js/index.js"></script>
   <script src="./node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+
+
 </body>
 
 </html>

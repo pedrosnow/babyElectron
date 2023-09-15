@@ -128,24 +128,40 @@ let index = {
                 },
                 body: JSON.stringify(this.data)
             })
-            .then(response => response.text())
+            .then(response => response.json())
             .then(result => {
+                
+                $("#alerta-enviando").remove()
 
-                let resultR = JSON.parse(result)
+                
+                if(result.erro){
+                    
+                    $(".container-send-number").append(`
+                    
+                        <div class="container-send-acesso" id="alerta-erro">
+                            <span class="fas fa-exclamation-circle icon-sucesso"></span>
+                            <div class="container-info">
+                                <div class="titulo">Erro</div>
+                                <div class="descricao">Não foi possivel enviar o acesso</div>
+                            </div>
+                        </div> 
+                    
+                    `)
 
-                if(resultR.erro){
-                       
-                    Swal.fire({
-                        title: 'Erro!',
-                        text: `Não foi possivel fazer o envio para o numero ${this.data.numeroLustrativo}, o servidor deve está off ou numero do celular não existe`,
-                        icon: 'warning',
-                        showCancelButton: false,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Sim',
-                        cancelButtonText: 'Não',
-                        allowOutsideClick: false,
-                    })
+                }else{
+
+
+                    $('.container-send-number').prepend(`
+                
+                        <div class="container-send-acesso" id="alerta-sucesso">
+                            <span class="fas fa-check-circle icon-sucesso"></span>
+                            <div class="container-info">
+                            <div class="titulo">Sucesso</div>
+                            <div class="descricao">Link para <strong>${this.data.numeroLustrativo}</strong></div>
+                            </div>
+                        </div> 
+                    `)
+
 
                 }
             })
@@ -166,22 +182,104 @@ let index = {
                 pacienteid: this.data.pacienteid
             })
         })
-        .then(response => response.text())
+        .then(response => response.json())
         .then(result => {
 
-            if(result == "Erro: Erro ao iniciar a transmissão ao vivo"){
+            console.log(result)
+            console.log(result == "Erro ao iniciar a live")
 
-                Swal.fire({
-                    title: 'Erro!',
-                    text: "Não foi possivel iniciar a live porque o programar tentou se conectar ao dispotivo de audio ou de video e não conseguiu",
-                    icon: 'warning',
-                    showCancelButton: false,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Sim',
-                    cancelButtonText: 'Não',
-                    allowOutsideClick: false,
+            if(result == "Erro ao iniciar a live"){
+
+                $("#container-modal").remove()
+
+                $("body").prepend(`
+
+                    <div id="container-modal">
+                        <div class="container-aviso-erro-stream">
+                            <div class="card" id="card-erro-ffmpeg">
+                            <div class="container-incone-titulo">
+                                <li class="	fas fa-times-circle"></li>
+                                <div class="titulo">Erro</div>
+                            </div>
+                            <div class="container-possivel-erro">
+                                <div class="titulo"><strong>Não foi possivel iniciar a live</strong></div>
+                                <div class="descricao">Aqui estão os possíveis erros</div>
+                                <ul>
+                                <li>Servidor da Live Offline</li>
+                                <li>Dispositivo de audio ou de video não encontrado</li>
+                                </ul>
+                                <div class="container-buttons">
+                                    <div class="titulo-button">Contate o suporte</div>
+                                    <button class="btn btn-primary">OK</button>
+                                    <button class="btn btn-warning" style="width:200px" id="gravar-video">Tentar gravar</button>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                `)
+
+                document.getElementById("gravar-video").addEventListener("click", ()=>{
+
+                    $("#container-modal").remove()
+
+                    $("body").prepend(`
+                    
+                        <div id="container-modal">
+                            <div id="container-gravando">
+                            <div class="card" id="card-gravando">
+                                <div id="caontgravando">
+                                    <div class="circle"></div> <div class="progresso" id="cronometro">00:00:00</div>
+                                </div>
+                                <div class="informacao" id="encerrar-gravacao">
+                                    Encerrar Gravação
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    
+                    `)
+                    
+                    
+                    fetch("http://localhost:5000/gravando", {
+                        method: 'POST',
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            chave: this.data.chave,
+                            pacienteid:  this.data.pacienteid
+                        }),
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if(result.status == 500){
+                            
+                            Swal.fire({
+                                title: 'Erro!',
+                                text: "Não foi possível começar o processo, verifique os dispositivos de áudio e video",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'Sim',
+                                cancelButtonText: 'Não',
+                                allowOutsideClick: false,
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.reload()
+                                }
+                            })
+                        }
+                    })
+                    .catch(error => console.log('error', error));
+
                 })
+
+
+                this.timeGravacao()
+                this.sendMensagemErro()
 
             }
 
@@ -191,6 +289,118 @@ let index = {
         $("body").html('')
         this.streamStart()
 
+    },
+
+    timeGravacao(){
+
+        let tempo = 0; // Tempo em segundos
+        let cronometro;
+  
+        function formatarTempo(segundos) {
+            const horas = Math.floor(segundos / 3600);
+            const minutos = Math.floor((segundos % 3600) / 60);
+            const segundosFormatados = segundos % 60;
+            return `${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segundosFormatados).padStart(2, '0')}`;
+        }
+  
+        function atualizarCronometro() {
+            document.getElementById("cronometro").textContent = formatarTempo(tempo);
+            tempo++;
+        }
+
+
+        let verificar = setInterval(() => {
+           
+
+            if(document.getElementById("encerrar-gravacao")){
+
+                clearInterval(verificar)
+
+                document.getElementById("encerrar-gravacao").addEventListener("click", ()=>{
+                
+                    Swal.fire({
+                        title: 'Aviso!',
+                        text: "Deseja encerrar a gravação ?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Sim',
+                        cancelButtonText: 'Não',
+                        allowOutsideClick: false,
+                    }).then((result) => {
+    
+                        if (result.isConfirmed) {
+
+                            clearInterval(cronometro)
+
+                            $("#container-gravando").html(`
+                                <div id="container-modal">
+                                    <div class="container-aviso-encerrando">
+                                    <div class="card" id="card-viso-encerrando">
+                                        <span class="loader"></span>
+                                        <div class="container-titulo-descricao">
+                                        <div class="titulo" id="titulo-encerrar">Encerrando</div>
+                                        <div class="descricao" id="alerta-descricao-encerrando">A live esta sendo encerrada</div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                        `)
+    
+                        fetch('http://localhost:5000/stream/encerrar',{
+                            method: "GET",
+                            headers: {
+                                "Content-Type":"application/json"
+                            },
+                        })
+                        .then(response => response.text())
+                        .then(result => {
+                            
+                            let response = JSON.parse(result)
+                            
+                            if(response.status == 200){
+
+                                setTimeout(() => {
+                                    
+                                    this.uploadFile()
+                                    window.location.reload()
+    
+                                }, 3000);
+                                
+                            }else{
+                                Swal.fire({
+                                    title: 'Erro!',
+                                    text: "Algo inesperado aconteceu, contate o suporte!!",
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#3085d6',
+                                    cancelButtonColor: '#d33',
+                                    confirmButtonText: 'Sim',
+                                    cancelButtonText: 'Não',
+                                    allowOutsideClick: false,
+                                })
+                            }
+                        })
+                        .catch(error => console.log('error', error));
+                        }
+
+                    })
+                })
+                
+
+            }
+            
+        }, 100);
+        
+        
+        // Iniciar o cronômetro automaticamente quando a página carrega
+        cronometro = setInterval(atualizarCronometro, 1000);
+
+    },
+
+    sendMensagemErro(){
+        console.log('criar o codigo para enviar a mensagem para o paciente avisao que o link enviado anterior não está funcionando')
     },
 
     streamStart(){
@@ -211,17 +421,15 @@ let index = {
             <div class="container_options-button">
                 
                 <div class="container-send-number">
-                    <div class="row">
-                    <div class="col">
-                        <label class="text-light">Enviando o Acesso</label>
-                        <input type="text" class="form-control" value="(86) 9 95747604">
+                
+                <div class="container-send-acesso" id="alerta-enviando">
+                    <span class="loader-mensagem"></span>
+                    <div class="container-info">
+                    <div class="titulo">Enviando</div>
+                    <div class="descricao">Link para <strong>${this.data.numeroLustrativo}</strong></div>
                     </div>
-                    </div>
-                    <div class="row">
-                    <div class="col">
-                        <button class="btn" id="enviar">00:40</button>
-                    </div>
-                    </div>
+                </div>
+                            
                 </div>
 
                 <button class="container-painel btn" id="encerrar">
@@ -287,36 +495,13 @@ let index = {
         },20000)
 
         </script>
-        
+                
         
         `)
 
-        let time = 15
-
-        let Time = setInterval(() => {
-
-            const minutes = Math.floor(time / 60);
-            const seconds = time % 60;
-          
-            const formattedMinutes = String(minutes).padStart(2, '0');
-            const formattedSeconds = String(seconds).padStart(2, '0');
-          
-            $("#enviar").html(`${formattedMinutes}:${formattedSeconds}`);
-            
-            if (time === 0) {
-              clearInterval(Time);
-              this.sendMensagem()
-            }
-          
-            time = time - 1;
-
-
-        }, 1000);
-
-        document.getElementById("enviar").addEventListener("click", ()=>{
-            clearInterval(Time)
+        setTimeout(() => {
             this.sendMensagem()
-        })
+        }, 5000);
 
         document.getElementById("encerrar").addEventListener("click", ()=>{
 
@@ -363,11 +548,13 @@ let index = {
 
                             `)
 
-                           setTimeout(() => {
+                            this.uploadFile()|
 
-                            window.location.reload()
+                            setTimeout(() => {
+                                
+                                window.location.reload()
 
-                           }, 3000);
+                            }, 3000);
                             
 
                         }else{
@@ -392,9 +579,18 @@ let index = {
                 }
               })
 
-            
-            
         })
+
+    },
+
+    uploadFile(){
+
+        fetch("http://localhost:5000/start_loop", {
+            method: "GET",
+        })
+        .then(response => response.text())
+        .then(result => console.log(result))
+        .catch(error => console.log('error', error));
 
     },
 
@@ -413,6 +609,7 @@ let index = {
                                     <li class="activate">Dispositivos</li>
                                     <li>Ffmpeg</li>
                                     <li>Conexao</li>
+                                    <li>Token</li>
                                 </ul>
                             </div>
                             <div id="container-config">
@@ -916,7 +1113,27 @@ let index = {
 
         }
 
-        let opcoes = {'Dispositivos': dispositivo, "Conexao": conexao, "Ffmpeg": ffmpeg, "Salvar": salvar}
+        let token = () => {
+
+            $("#container-config").html(`
+        
+                <div class="row">
+                    <div class="col">
+                        <label>Token</label>
+                        <input type="text"class="form-control" id="token"> 
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <button style="margin-top:10px;width:300px" class="btn btn-success">Salvar</button>
+                    </div>
+                </div>
+        
+            `)
+
+        }
+
+        let opcoes = {'Dispositivos': dispositivo, "Conexao": conexao, "Ffmpeg": ffmpeg, "Salvar": salvar, "Token": token}
 
         let li = document.querySelectorAll('li')
 
@@ -933,147 +1150,6 @@ let index = {
     },
 
     
-    // Processo(){
-        
-    //     let enviado = 0
-    //     let max = 0
-    //     let index = 0
-    //     let control = []
-    //     let erro = []
-
-    //     $("main").append(`
-    //         <div id="container-prgresso">
-    //             <div class="spinner-border" style="width: 2.5rem; height: 2.5rem;" role="status"></div>
-    //                 <div class="container-titulo-progresso">
-    //                 <div class="titulo">Processando <span class="badge badge-secondary" style="background: #000" id="indicator">0</span></div>
-    //                 <div class="progresso" id="processo-after">
-    //                     Verificando...
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     `)
-
-    //     fetch("http://localhost:5000/processo/verificar", {
-    //         method: 'POST',
-    //     })
-    //     .then(response => response.text())
-    //     .then(result => {
-
-    //         const response = JSON.parse(result)
-
-    //         max = response.length
-    //         for(const row of response){
-    //             control.push(row)
-    //         }
-
-    //         if(response.length == 0){
-    //             $("#container-prgresso").remove()
-    //         }
-            
-    //         let processo = () => {
-
-    //             $("#processo-after").html('1/2 Processando o arquivo')
-    //             $("#indicator").html(max)
-
-    //            setTimeout(() => {
-    //                 fetch('http://localhost:5000/converte',{
-    //                     method: "POST",
-    //                     headers: {
-    //                         "Content-Type":"application/json"
-    //                     },
-    //                     body: JSON.stringify({'name_file': control[index].chave})
-    //                 })
-    //                 .then(response => response.text())
-    //                 .then(result => {
-
-    //                     $("#processo-after").html('2/2 Enviando o arquivo')
-
-    //                     setTimeout(() => {
-                            
-                              
-    //                     fetch('http://localhost:5000/uploadFile',{
-    //                         method: "POST",
-    //                         headers: {
-    //                             "Content-Type":"application/json"
-    //                         },
-    //                         body: JSON.stringify({'chave': control[index].chave})
-    //                     })
-    //                     .then(response => response.text())
-    //                     .then(result => {
-
-    //                         if(!result == "erro"){
-
-    //                             $("#processo-after").html('Enviado com sucesso')
-
-    //                             enviado = enviado + 1
-        
-    //                             setTimeout(() => {
-                                    
-    //                                 if(enviado < max){
-    //                                     index = index + 1
-    //                                     processo()
-    //                                 }else{
-    //                                     if(erro.length == 0){
-
-    //                                         $("#container-prgresso").remove()
-
-    //                                     }else{
-
-    //                                         control = control.splice(0, control.length)
-                                            
-    //                                         for(const row of erro){
-    //                                             control.push(row)
-    //                                         }
-    //                                     }
-    //                                 }
-        
-    //                             }, 1000);
-
-    //                         }else{
-
-    //                             $("#indicator").html('Não foi possivel enviar')
-    //                             $("#processo-after").html('Programa vai ficar tentando até conseguir')
-
-    //                             erro.push(control[index])
-
-    //                             setTimeout(() => {
-    //                                 processo()
-    //                             }, 1000);
-    //                         }
-                        
-    //                     })
-    //                     .catch(error => console.log('error', error));
-
-    //                     }, 2000);
-
-    //                 })
-    //                 .catch(error => console.log('error', error));
-
-    //            }, 100000);
-    //         }            
-    //         processo()
-
-    //     })
-    //     .catch(error => console.log('error', error));
-
-        // console.log(max)
-
-     
-
-        // console.log(this.data)
-
-        
-
-        // setTimeout(() => {
-
-        //     $("#titulo-encerrar").html('Carregando...')
-        //     $("#alerta-descricao-encerrando").html('Convertendo o arquivos para o formato suportado')
-
-       
-
-        // }, 1500);
-
-    // },
 
   
    

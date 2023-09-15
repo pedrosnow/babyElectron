@@ -1,0 +1,23 @@
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+
+.circle {
+    margin-left: 10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: red; /* Cor inicial do círculo */
+    transition: background-color 0.3s ease; /* Efeito de transição suave */
+    animation: pulse 1s infinite; /* Inicia a animação "pulse" infinitamente */
+}

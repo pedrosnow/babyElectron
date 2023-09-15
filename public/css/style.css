@@ -558,6 +558,28 @@ template {
   font-size: 15px;
 }
 
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.circle {
+  margin-left: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: red; /* Cor inicial do círculo */
+  transition: background-color 0.3s ease; /* Efeito de transição suave */
+  animation: pulse 1s infinite; /* Inicia a animação "pulse" infinitamente */
+}
+
 main {
   height: 100%;
   display: flex;
@@ -660,27 +682,6 @@ main #btn-voltar:hover {
   justify-content: center;
   align-items: center;
 }
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-.container-stream .loading-video-stream #cardAviso .circle {
-  margin-left: 10px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background-color: red; /* Cor inicial do círculo */
-  transition: background-color 0.3s ease; /* Efeito de transição suave */
-  animation: pulse 1s infinite; /* Inicia a animação "pulse" infinitamente */
-}
 .container-stream .container-video {
   margin-right: 10px;
   padding: 10px;
@@ -698,50 +699,52 @@ main #btn-voltar:hover {
   width: 18%;
   height: 98%;
 }
-.container-stream .container_options-button .container-send-number {
-  background: #FFF;
-  background: #000000;
-  padding: 13px 10px;
+.container-stream .container_options-button .container-send-number .loader-mensagem {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #004085;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+.container-stream .container_options-button .container-send-number #alerta-enviando {
+  background: #CCE5FF;
+  color: #004085;
+  border: 1px solid #B8DAFF;
+}
+.container-stream .container_options-button .container-send-number #alerta-sucesso {
+  background: #D4EDDA;
+  color: #155724;
+  border: 1px solid #C3E6CB;
+}
+.container-stream .container_options-button .container-send-number #alerta-erro {
+  background: #FFF3CD;
+  color: #856404;
+  border: 1px solid #FFEEBA;
+}
+.container-stream .container_options-button .container-send-number .container-send-acesso {
   border-radius: 5px;
   margin-bottom: 10px;
-  position: relative;
-}
-.container-stream .container_options-button .container-send-number #enviar {
-  background: green;
-  color: #fff;
-  width: 100%;
-  margin-top: 10px;
-}
-.container-stream .container_options-button .container-send-number #modal-aviso-sucesso {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 5px;
-  z-index: 5;
-  background: #ffffff;
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  padding: 10px;
 }
-.container-stream .container_options-button .container-send-number #modal-aviso-sucesso .incone {
-  margin-right: 10px;
-  margin-left: 20px;
+.container-stream .container_options-button .container-send-number .container-send-acesso .container-info {
+  margin-left: 15px;
+}
+.container-stream .container_options-button .container-send-number .container-send-acesso .container-info .titulo {
+  font-weight: 600;
+  font-size: 18px;
+}
+.container-stream .container_options-button .container-send-number .container-send-acesso .icon-sucesso {
   font-size: 40px;
-  color: rgb(0, 192, 0);
-}
-.container-stream .container_options-button .container-send-number #modal-aviso-sucesso .container-status .titulo {
-  color: rgb(0, 192, 0);
-  font-size: 25px;
-}
-.container-stream .container_options-button .container-send-number #modal-aviso-sucesso .container-status .descricao {
-  color: rgb(0, 192, 0);
-  font-size: 17px;
 }
 .container-stream .container-painel {
   width: 100%;
-  height: 85%;
+  height: 91%;
   border-radius: 5px;
   background: #bc0000;
   color: #fff;
@@ -754,5 +757,94 @@ main #btn-voltar:hover {
 }
 .container-stream .container-painel:hover {
   background: red;
+  color: #fff;
+}
+
+.container-aviso-erro-stream {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.container-aviso-erro-stream #card-erro-ffmpeg {
+  width: 35%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-direction: row;
+  padding: 20px;
+}
+.container-aviso-erro-stream #card-erro-ffmpeg .container-incone-titulo {
+  display: flex;
+  width: 40%;
+  height: 260px;
+  background: #F8D7DA;
+  border-radius: 5px;
+  margin-right: 25px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.container-aviso-erro-stream #card-erro-ffmpeg .container-incone-titulo li {
+  font-size: 50px;
+  color: #721C24;
+}
+.container-aviso-erro-stream #card-erro-ffmpeg .container-incone-titulo .titulo {
+  font-size: 25px;
+  color: #721C24;
+}
+.container-aviso-erro-stream #card-erro-ffmpeg .container-possivel-erro .titulo {
+  font-size: 25px;
+}
+.container-aviso-erro-stream #card-erro-ffmpeg .container-possivel-erro .descricao {
+  color: gray;
+}
+.container-aviso-erro-stream #card-erro-ffmpeg .container-possivel-erro ul {
+  margin-top: 25px;
+}
+.container-aviso-erro-stream #card-erro-ffmpeg .container-possivel-erro .container-buttons .titulo-button {
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+.container-aviso-erro-stream #card-erro-ffmpeg .container-possivel-erro .container-buttons button {
+  width: 120px;
+}
+
+#container-gravando {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+}
+#container-gravando #card-gravando {
+  width: 400px;
+  padding: 10px;
+  background: #F2F2F2;
+}
+#container-gravando #card-gravando #caontgravando {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  padding: 15px;
+}
+#container-gravando #card-gravando #caontgravando .progresso {
+  color: #fff;
+  margin-left: 10px;
+}
+#container-gravando #card-gravando .informacao {
+  cursor: pointer;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: red;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
   color: #fff;
 }/*# sourceMappingURL=style.css.map */
