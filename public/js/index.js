@@ -585,12 +585,8 @@ let index = {
 
     uploadFile(){
 
-        fetch("http://localhost:5000/start_loop", {
-            method: "GET",
-        })
-        .then(response => response.text())
-        .then(result => console.log(result))
-        .catch(error => console.log('error', error));
+        fetch("http://localhost:5000/start_loop")
+        
 
     },
 
