@@ -1,5 +1,5 @@
 let index = {
-    
+
     data: {
         celular: "",
         numeroLustrativo: "",
@@ -172,6 +172,10 @@ let index = {
 
     controllStream(){
 
+        let timeoutSendMensage = setTimeout(() => {
+            this.sendMensagem()
+        }, 4000);
+
         fetch('http://localhost:5000/record_and_stream',{
             method: "POST",
             headers: {
@@ -185,10 +189,9 @@ let index = {
         .then(response => response.json())
         .then(result => {
 
-            console.log(result)
-            console.log(result == "Erro ao iniciar a live")
-
             if(result == "Erro ao iniciar a live"){
+
+                clearTimeout(timeoutSendMensage)
 
                 $("#container-modal").remove()
 
@@ -361,12 +364,7 @@ let index = {
                             
                             if(response.status == 200){
 
-                                setTimeout(() => {
-                                    
-                                    this.uploadFile()
-                                    window.location.reload()
-    
-                                }, 3000);
+                                this.process()
                                 
                             }else{
                                 Swal.fire({
@@ -499,10 +497,6 @@ let index = {
         
         `)
 
-        setTimeout(() => {
-            this.sendMensagem()
-        }, 5000);
-
         document.getElementById("encerrar").addEventListener("click", ()=>{
 
             Swal.fire({
@@ -548,14 +542,7 @@ let index = {
 
                             `)
 
-                            this.uploadFile()|
-
-                            setTimeout(() => {
-                                
-                                window.location.reload()
-
-                            }, 3000);
-                            
+                            this.process()
 
                         }else{
                             
@@ -583,10 +570,61 @@ let index = {
 
     },
 
-    uploadFile(){
+    process(){
 
-        fetch("http://localhost:5000/start_loop")
-        
+        $("#titulo-encerrar").html('Processando')
+        $("#alerta-descricao-encerrando").html('1/2 Convertendo o arquivo')
+
+        fetch('http://localhost:5000/converte',{
+                method: "POST",
+                headers: {
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify(
+                    {
+                        'name_file': this.data.chave,
+                    }
+                )
+            })
+            .then(response => response.json())
+            .then(result => {
+
+                $("#processo-after").html('2/2 Enviando o arquivo')
+                
+                if(result.status == 200){
+                   
+                    fetch('http://localhost:5000/uploadFile',{
+                        method: "POST",
+                        headers: {
+                            "Content-Type":"application/json"
+                        },
+                        body: JSON.stringify({'chave': this.data.chave, 'acesso': this.data.pacienteid})
+                    })
+                    .then(response => response.text())
+                    .then(result => {
+    
+                        if(!result == "erro"){
+    
+                            $("#processo-after").html('Enviado com sucesso')
+    
+                           setTimeout(() => {
+                                document.location.reload()
+                           }, 1000);
+    
+                        }else{
+    
+                            $("#indicator").html('Não foi possivel enviar')
+                            $("#processo-after").html('Programa vai ficar tentando até conseguir')
+                            
+                        }
+    
+                    })
+                    .catch(error => console.log('error', error));
+
+                }
+
+            })
+            .catch(error => console.log('error', error));
 
     },
 
