@@ -389,7 +389,7 @@ let index = {
 
             }
             
-        }, 100);
+        }, 5000);
         
         
         // Iniciar o cronômetro automaticamente quando a página carrega
@@ -514,10 +514,11 @@ let index = {
                 if (result.isConfirmed) {
 
                     fetch('http://localhost:5000/stream/encerrar',{
-                        method: "GET",
+                        method: "POST",
                         headers: {
                             "Content-Type":"application/json"
                         },
+                        body: JSON.stringify({chave: this.data.chave})
                     })
                     .then(response => response.text())
                     .then(result => {
@@ -542,7 +543,13 @@ let index = {
 
                             `)
 
-                            this.process()
+                            setTimeout(() => {
+                                this.process()
+                            }, 1000);
+
+                            setTimeout(() => {
+                                window.location.reload()
+                            }, 2000);
 
                         }else{
                             
@@ -582,46 +589,15 @@ let index = {
                 },
                 body: JSON.stringify(
                     {
-                        'name_file': this.data.chave,
+                        'chave': this.data.chave,
+                        'acesso': this.data.pacienteid
                     }
                 )
             })
             .then(response => response.json())
             .then(result => {
 
-                $("#processo-after").html('2/2 Enviando o arquivo')
-                
-                if(result.status == 200){
-                   
-                    fetch('http://localhost:5000/uploadFile',{
-                        method: "POST",
-                        headers: {
-                            "Content-Type":"application/json"
-                        },
-                        body: JSON.stringify({'chave': this.data.chave, 'acesso': this.data.pacienteid})
-                    })
-                    .then(response => response.text())
-                    .then(result => {
-    
-                        if(!result == "erro"){
-    
-                            $("#processo-after").html('Enviado com sucesso')
-    
-                           setTimeout(() => {
-                                document.location.reload()
-                           }, 1000);
-    
-                        }else{
-    
-                            $("#indicator").html('Não foi possivel enviar')
-                            $("#processo-after").html('Programa vai ficar tentando até conseguir')
-                            
-                        }
-    
-                    })
-                    .catch(error => console.log('error', error));
-
-                }
+               console.log(result)
 
             })
             .catch(error => console.log('error', error));
