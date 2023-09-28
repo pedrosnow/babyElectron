@@ -1,8 +1,60 @@
-// main.js
 
-// Modules to control application life and create native browser window
 const { app, BrowserWindow } = require('electron')
 const path = require('path')
+const express = require('express');
+const expressApp = express();
+const { execFile } = require('child_process');
+const db = require('./sqlite')
+const expressPort = 3001;
+const timeout = require('connect-timeout');
+let pythonProcess;
+
+
+
+expressApp.use(express.json());
+
+expressApp.post('/start-server', (req, res) => {
+  
+  const backend = path.join(__dirname, '..', 'BabyPy', 'dist', 'run', 'run.exe')
+
+  pythonProcess = execFile( backend, { windowsHide: true  }, (err, stdout, stderr) => {
+    if (err) {
+      console.log(`ERRO ${err}`);
+    }
+    if (stdout) {
+      console.log(`SAIDA ${stdout}`);
+    }
+    if (stderr) {
+      console.log(`SAIDA ${stderr}`);
+    }
+
+  });
+  
+  res.status(200).json('ola')
+
+});
+
+expressApp.use(timeout('5m'));
+
+expressApp.post('/download-video', (req, res) => {
+
+  const { chave } = req.body;
+  const diskLocal = path.parse(__dirname).root
+  const videoPath = path.join(diskLocal, 'streamdata', 'data', `${chave}.mp4`);
+  
+  res.download(videoPath, `${chave}.mp4`)
+
+});
+
+expressApp.listen(expressPort, () => {
+  console.log(`Servidor Express rodando em http://localhost:${expressPort}`);
+});
+
+
+expressApp.post('/upload-video', (req, res) => {
+
+})
+
 
 const createWindow = () => {
   // Create the browser window.
@@ -16,6 +68,7 @@ const createWindow = () => {
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
+
 }
 
 // This method will be called when Electron has finished
@@ -40,3 +93,7 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. Você também pode colocar eles em arquivos separados e requeridos-as aqui.
+
+
+
+

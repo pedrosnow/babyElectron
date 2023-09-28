@@ -88,32 +88,47 @@ let index = {
                     <span class="loader"></span>
                     <div class="container-titulo-descricao">
                     <div class="titulo">Carregando...</div>
-                    <div class="descricao" id="descricao-modal">Gerando chave de acesso</div>
+                    <div class="descricao" id="descricao-modal">Conectando no servidor</div>
                     </div>
                 </div>
                 </div>
             </div>
         `)
 
-        setTimeout(() => {
         
-            fetch('http://localhost:5000/gerarchave',{
-                method: "POST",
-            })
-            .then(response => response.text())
-            .then(result => {
-                this.data.chave = result.replace(/"/g, '').replace(/\n/g, '')
-         
-                $("#descricao-modal").html('Iniciando a live')
+        fetch('http://localhost:3001/start-server',{ 
+            method: "POST" 
+        })
 
-                setTimeout(() => {
-                    this.controllStream()
-                },2000);
+        .then(result => {
+
+            console.log(result)
+
+            $("#descricao-modal").html('Gerando chave de acesso')
+        
+            setTimeout(() => {
+            
+                fetch('http://localhost:5000/gerarchave',{
+                        method: "POST",
+                    })
+                    .then(response => response.text())
+                    .then(result => {
+                        this.data.chave = result.replace(/"/g, '').replace(/\n/g, '')
                 
-            })
-            .catch(error => console.log('error', error));
+                        $("#descricao-modal").html('Iniciando a live')
 
-        }, 1000);
+                        setTimeout(() => {
+                            this.controllStream()
+                        },2000);
+                        
+                    })
+                    .catch(error => console.log('error', error));
+
+            }, 1000);
+
+        })
+
+        
 
     },
     
@@ -213,7 +228,7 @@ let index = {
                                 </ul>
                                 <div class="container-buttons">
                                     <div class="titulo-button">Contate o suporte</div>
-                                    <button class="btn btn-primary">OK</button>
+                                    <button class="btn btn-primary" id="ok-reload">OK</button>
                                     <button class="btn btn-warning" style="width:200px" id="gravar-video">Tentar gravar</button>
                                 </div>
                             </div>
@@ -222,6 +237,10 @@ let index = {
                     </div>
                 
                 `)
+
+                document.getElementById("ok-reload").addEventListener("click", ()=>{
+                    document.location.reload()
+                })
 
                 document.getElementById("gravar-video").addEventListener("click", ()=>{
 
@@ -357,14 +376,32 @@ let index = {
                                 "Content-Type":"application/json"
                             },
                         })
-                        .then(response => response.text())
+                        .then(response => response.json())
                         .then(result => {
+
+                            console.log(result)
                             
-                            let response = JSON.parse(result)
+                            let response = result
                             
                             if(response.status == 200){
 
-                                this.process()
+                                $("body").prepend(`
+                            
+                                    <div id="container-modal">
+                                        <div class="container-aviso-encerrando">
+                                        <div class="card" id="card-viso-encerrando">
+                                            <span class="loader"></span>
+                                            <div class="container-titulo-descricao">
+                                            <div class="titulo" id="titulo-encerrar">Encerrando</div>
+                                            <div class="descricao" id="alerta-descricao-encerrando">A live esta sendo encerrada</div>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+
+                            `)
+                            
+                            // Colocar codigo do upload
                                 
                             }else{
                                 Swal.fire({
@@ -542,14 +579,10 @@ let index = {
                                 </div>
 
                             `)
-
-                            setTimeout(() => {
-                                this.process()
-                            }, 1000);
-
-                            setTimeout(() => {
-                                window.location.reload()
-                            }, 2000);
+                            
+                            // setTimeout(() => {
+                            //     this.uploadFile()
+                            // }, 2000);
 
                         }else{
                             
@@ -577,33 +610,22 @@ let index = {
 
     },
 
-    process(){
-
-        $("#titulo-encerrar").html('Processando')
-        $("#alerta-descricao-encerrando").html('1/2 Convertendo o arquivo')
-
-        fetch('http://localhost:5000/converte',{
-                method: "POST",
-                headers: {
-                    "Content-Type":"application/json"
-                },
-                body: JSON.stringify(
-                    {
-                        'chave': this.data.chave,
-                        'acesso': this.data.pacienteid
-                    }
-                )
+    uploadFile(){
+        
+        fetch('http://localhost:5000/upload/file',{
+            method: "POST",
+            headers: {
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify({
+                acesso: this.data.pacienteid,
+                chave: this.data.chave
             })
-            .then(response => response.json())
-            .then(result => {
-
-               console.log(result)
-
-            })
-            .catch(error => console.log('error', error));
+        })
+        .then(result => console.log(result))
+        .catch(erro => console.log(erro))
 
     },
-
     
     configuracao(){
 
@@ -620,6 +642,7 @@ let index = {
                                     <li>Ffmpeg</li>
                                     <li>Conexao</li>
                                     <li>Token</li>
+                                    <li>Registro</li>
                                 </ul>
                             </div>
                             <div id="container-config">
@@ -652,46 +675,26 @@ let index = {
 
             $('#container-config').html(`
             
-                    <div class="row">
-                        <div class="col" style="position: relative;" id="col-ffmpegf-largura">
-                            <label>Largura</label>
-                            <input type="text"class="form-control" id="largura-ffmpegf"> 
-                            <li class="fas fa-check-circle" id="sucess-ffmpegf-largura" style="position:absolute;right:20px;top:34px;color:green;font-size:20px"></li>
-                        </div>
-                        <div class="col" style="position: relative;" id="col-ffmpegf-altura">
-                            <label>Altura</label>
-                            <input type="text"class="form-control" id="altura-ffmpegf"> 
-                            <li class="fas fa-check-circle" id="sucess-ffmpegf-altura" style="position:absolute;right:20px;top:34px;color:green;font-size:20px"></li>
-                        </div>
+                <div class="row">
+                    <div class="col" style="position: relative;" id="col-ffmpegf-largura">
+                        <label>Largura</label>
+                        <input type="text"class="form-control" id="largura-ffmpegf"> 
+                        <li class="fas fa-check-circle" id="sucess-ffmpegf-largura" style="position:absolute;right:20px;top:34px;color:green;font-size:20px"></li>
                     </div>
-                    <br>
-                    <div class="row">
-                        <div class="col" style="position: relative;" id="col-ffmpegf-taxmostraudio">
-                            <label>Taxa de mostragem de áudio</label>
-                            <input type="text" class="form-control" id="taxamostragemaudui-ffmpegf">
-                            <li class="fas fa-check-circle" id="sucess-ffmpegf-taxmostraudio" style="position:absolute;right:20px;top:34px;color:green;font-size:20px"></li>
-                        </div>
-                        <div class="col-4" style="position: relative;" id="col-ffmpegf-bitsaudio">
-                            <label>Taxa de bits de áudio</label>
-                            <input type="text" class="form-control" id="taxabitsaudio-ffmpegf">
-                            <li class="fas fa-check-circle" id="sucess-ffmpegf-bitsaudio" style="position:absolute;right:20px;top:34px;color:green;font-size:20px"></li>
-                        </div>
-                    </div> 
-                    <br>
-                    <div class="row">
-
-                        <div class="col" style="position: relative;" id="col-ffmpegf-codecaudio">
-                            <label>codec audio</label>
-                            <input type="text" class="form-control" id="codecaudio-ffmpegf">
-                            <li class="fas fa-check-circle" id="sucess-ffmpegf-codecaudio" style="position:absolute;right:20px;top:34px;color:green;font-size:20px"></li>
-                        </div>
-
-                        <div class="col-4" style="position: relative;" id="col-ffmpegf-fps">
-                            <label>fps</label>
-                            <input type="text" class="form-control" id="fps-ffmpegf">
-                            <li class="fas fa-check-circle" id="sucess-ffmpegf-fps" style="position:absolute;right:20px;top:34px;color:green;font-size:20px"></li>
-                        </div>
-                    </div> 
+                    <div class="col" style="position: relative;" id="col-ffmpegf-altura">
+                        <label>Altura</label>
+                        <input type="text"class="form-control" id="altura-ffmpegf"> 
+                        <li class="fas fa-check-circle" id="sucess-ffmpegf-altura" style="position:absolute;right:20px;top:34px;color:green;font-size:20px"></li>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-4" style="position: relative;" id="col-ffmpegf-fps">
+                        <label>fps</label>
+                        <input type="text" class="form-control" id="fps-ffmpegf">
+                        <li class="fas fa-check-circle" id="sucess-ffmpegf-fps" style="position:absolute;right:20px;top:34px;color:green;font-size:20px"></li>
+                    </div>
+                </div> 
             
             `);
 
@@ -769,97 +772,6 @@ let index = {
                     if(!document.getElementById("sucess-ffmpegf-altura")){
 
                         $("#col-ffmpegf-altura").append(`<li class="fas fa-check-circle" id="sucess-ffmpegf-altura" style="position:absolute;right:20px;top:34px;color:green;font-size:20px"></li>`)
-                    }
-                })
-                .catch(error => console.log('error', error));
-
-            })
-
-            document.getElementById("taxamostragemaudui-ffmpegf").addEventListener("keyup", (event)=>{
-
-                $("#sucess-ffmpegf-taxmostraudio").remove()
-
-                if(!document.getElementById("loading-ffmpegf-taxmostraudio")){
-
-                    $("#col-ffmpegf-taxmostraudio").append(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="loading-ffmpegf-taxmostraudio" style="position:absolute;right:24px;top:35px"></span>`)
-                }
-                
-                fetch("http://localhost:5000/ffmpeg/edit", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type":"application/json"
-                    },
-                    body: JSON.stringify({'tipo': 'taxmostraudio', 'valor': event.target.value})
-                })
-                .then(response => response.text())
-                .then(result => {
-                    
-                    $("#loading-ffmpegf-taxmostraudio").remove()
-
-                    if(!document.getElementById("sucess-ffmpegf-taxmostraudio")){
-
-                        $("#col-ffmpegf-taxmostraudio").append(`<li class="fas fa-check-circle" id="sucess-ffmpegf-taxmostraudio" style="position:absolute;right:20px;top:34px;color:green;font-size:20px"></li>`)
-                    }
-                })
-                .catch(error => console.log('error', error));
-
-            })
-
-            document.getElementById("taxabitsaudio-ffmpegf").addEventListener("keyup", (event)=>{
-
-                $("#sucess-ffmpegf-bitsaudio").remove()
-
-                if(!document.getElementById("loading-ffmpegf-bitsaudio")){
-
-                    $("#col-ffmpegf-bitsaudio").append(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="loading-ffmpegf-bitsaudio" style="position:absolute;right:24px;top:35px"></span>`)
-                }
-                
-                fetch("http://localhost:5000/ffmpeg/edit", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type":"application/json"
-                    },
-                    body: JSON.stringify({'tipo': 'texabitsaudio', 'valor': event.target.value})
-                })
-                .then(response => response.text())
-                .then(result => {
-                    
-                    $("#loading-ffmpegf-bitsaudio").remove()
-
-                    if(!document.getElementById("sucess-ffmpegf-bitsaudio")){
-
-                        $("#col-ffmpegf-bitsaudio").append(`<li class="fas fa-check-circle" id="sucess-ffmpegf-bitsaudio" style="position:absolute;right:20px;top:34px;color:green;font-size:20px"></li>`)
-                    }
-                })
-                .catch(error => console.log('error', error));
-
-            })
-
-
-            document.getElementById("codecaudio-ffmpegf").addEventListener("keyup", (event)=>{
-
-                $("#sucess-ffmpegf-codecaudio").remove()
-
-                if(!document.getElementById("loading-ffmpegf-codecaudio")){
-
-                    $("#col-ffmpegf-codecaudio").append(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="loading-ffmpegf-codecaudio" style="position:absolute;right:24px;top:35px"></span>`)
-                }
-                
-                fetch("http://localhost:5000/ffmpeg/edit", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type":"application/json"
-                    },
-                    body: JSON.stringify({'tipo': 'codec', 'valor': event.target.value})
-                })
-                .then(response => response.text())
-                .then(result => {
-                    
-                    $("#loading-ffmpegf-codecaudio").remove()
-
-                    if(!document.getElementById("sucess-ffmpegf-codecaudio")){
-
-                        $("#col-ffmpegf-codecaudio").append(`<li class="fas fa-check-circle" id="sucess-ffmpegf-codecaudio" style="position:absolute;right:20px;top:34px;color:green;font-size:20px"></li>`)
                     }
                 })
                 .catch(error => console.log('error', error));
@@ -1143,7 +1055,14 @@ let index = {
 
         }
 
-        let opcoes = {'Dispositivos': dispositivo, "Conexao": conexao, "Ffmpeg": ffmpeg, "Salvar": salvar, "Token": token}
+        let registro = () =>{
+            $("#container-config").html(`
+                <div id="container-registro"></div>
+
+            `)
+        }
+
+        let opcoes = {'Dispositivos': dispositivo, "Conexao": conexao, "Ffmpeg": ffmpeg, "Salvar": salvar, "Token": token, "Registro": registro}
 
         let li = document.querySelectorAll('li')
 
@@ -1158,9 +1077,6 @@ let index = {
         });
 
     },
-
-    
-
   
    
 }
