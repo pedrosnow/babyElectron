@@ -96,17 +96,15 @@ let index = {
         `)
 
         
-        fetch('http://localhost:3001/start-server',{ 
-            method: "POST" 
-        })
+        // fetch('http://localhost:3001/start-server',{ 
+        //     method: "POST" 
+        // })
 
-        .then(result => {
+        // .then(result => {
 
-            console.log(result)
-
-            $("#descricao-modal").html('Gerando chave de acesso')
+        //     $("#descricao-modal").html('Gerando chave de acesso')
         
-            setTimeout(() => {
+        //     setTimeout(() => {
             
                 fetch('http://localhost:5000/gerarchave',{
                         method: "POST",
@@ -124,12 +122,7 @@ let index = {
                     })
                     .catch(error => console.log('error', error));
 
-            }, 1000);
-
-        })
-
-        
-
+    
     },
     
     sendMensagem(){
@@ -402,6 +395,16 @@ let index = {
                             `)
                             
                             // Colocar codigo do upload
+
+                            setTimeout(() => {
+                                fetch('http://localhost:3001/upload-video')
+                            }, 1000);
+
+                            setTimeout(() => {
+                                
+                                window.location.reload()
+
+                            }, 3000);
                                 
                             }else{
                                 Swal.fire({
